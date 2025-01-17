@@ -1,0 +1,7 @@
+savox servo can only be told inputs between 6 and 179 degrees for some reason lol
+all the servos have the same number of teeth spline so any horn works for any servo
+
+Servo degree mapping notes:
+Black servo, inputs: 6-179, outputs: 0-177
+Blue servo, inputs: 0-180, outputs: 0-268
+Red servo, inputs: 0-180, outputs: 0-260
