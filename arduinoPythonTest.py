@@ -9,12 +9,13 @@ for one in ports:
     print(str(one))
 
 serialInst.baudrate = 115200
-serialInst.port = "COM3"
+serialInst.port = "/dev/cu.usbserial-1120"
 serialInst.open()
 
 while True:
     command = input() + "\n"
     serialInst.write(command.encode('utf-8'))
 
-    if command == 'exit':
+    if command == 'exit\n':
+        serialInst.close()
         exit()
