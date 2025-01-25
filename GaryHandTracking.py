@@ -22,7 +22,7 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 mp_pose = mp.solutions.pose
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 counter = 0
 img_width = 0
 img_height = 0
@@ -130,7 +130,7 @@ with mp_pose.Pose(
               mp_drawing_styles.get_default_hand_landmarks_style(),
               mp_drawing_styles.get_default_hand_connections_style())
             
-            if handResults.multi_hand_landmarks:
+            if handResults.multi_hand_landmarks and counter & 3 == 0:
                #pass
                serialInst.write(gripCommand.encode('utf-8'))
                serialInst.write(wristCommand.encode('utf-8'))
