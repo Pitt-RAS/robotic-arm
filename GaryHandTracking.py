@@ -7,14 +7,16 @@ import numpy as np
 ports = serial.tools.list_ports.comports()
 serialInst = serial.Serial()
 portsList = []
+numPrevious = 15 #This value must be greater than or equal to 1.
 
+filter = np.full((5, numPrevious), 90)
 
 for one in ports:
     portsList.append(str(one))
     print(str(one))
 
 serialInst.baudrate = 115200
-serialInst.port = "/dev/cu.usbserial-1110"
+serialInst.port = "/dev/cu.usbserial-1120"
 serialInst.open()
 
 mp_drawing = mp.solutions.drawing_utils
@@ -32,6 +34,7 @@ with mp_pose.Pose(
     model_complexity=0, min_detection_confidence=0.5, min_tracking_confidence=0.5,
     max_num_hands=1) as hands:
     while cap.isOpened():
+        counter += 1
         success, image = cap.read()
         if not success:
             print("Ignoring empty camera frame.")
@@ -51,15 +54,17 @@ with mp_pose.Pose(
           elbowY = results.pose_landmarks.landmark[14].y
           shoulderX = results.pose_landmarks.landmark[12].x
           shoulderY = results.pose_landmarks.landmark[12].y
-          counter += 1
+          
           #This is the calculation to get the "elbow" working on the orange arm
           A = sqrt((wristX-shoulderX)**2 + (wristY-shoulderY)**2)
           B = sqrt((elbowX-shoulderX)**2 + (elbowY-shoulderY)**2)
           C = sqrt((wristX-elbowX)**2 + (wristY-elbowY)**2)
           a = acos((C**2 + B**2 - A**2) / (2*C*B))
           a = (180 * a) / 3.14159
+          a = 180 - a
+          filter[2][counter % numPrevious] = a
           
-          elbowCommand = str(2) + str(int(180-a)) + "\n"
+          elbowCommand = str(2) + str(int(np.mean(filter[2]))) + "\n"
 
           #This is the calculation to get the "shoulder" working on the orange arm
           #Still using B from above
@@ -68,7 +73,37 @@ with mp_pose.Pose(
           shoulderAngle = acos(height/B)
           shoulderAngle = (180 * shoulderAngle) / 3.14159
           mappedShoulderAngle = 15 + ((shoulderAngle * 105) / 180)
-          shoulderCommand = str(1) + str(int(mappedShoulderAngle)) + "\n"  
+          filter[1][counter % numPrevious] = mappedShoulderAngle
+          shoulderCommand = str(1) + str(int(np.mean(filter[1]))) + "\n"
+
+
+          shoulders = [shoulderX-results.pose_landmarks.landmark[11].x, shoulderY-results.pose_landmarks.landmark[11].y]
+          upperarm = [shoulderX-elbowX, shoulderY-elbowY]
+          shoulderVector = np.array(shoulders)
+          upperarmVector = np.array(upperarm)
+
+
+          dot_product = np.dot(shoulderVector, upperarmVector)
+
+          # Calculate the magnitudes of the vectors
+          magnitude_shoulder = np.linalg.norm(shoulderVector)
+          magnitude_upperarm = np.linalg.norm(upperarmVector)
+
+          # Calculate the cosine of the angle
+          cos_angle = dot_product / (magnitude_shoulder * magnitude_upperarm)
+
+          # Calculate the angle in radians
+          angle_radians = np.arccos(cos_angle)
+
+          # Convert the angle to degrees
+          angle_degrees = np.degrees(angle_radians)
+
+          #Flip the angle
+          #angle_degrees = 180 - angle_degrees
+
+          filter[0][counter % numPrevious] = angle_degrees
+          
+          baseCommand = str(0) + str(int(np.mean(filter[0]))) + "\n"
 
           #Draw pose locations on the image
           mp_drawing.draw_landmarks(
@@ -89,7 +124,8 @@ with mp_pose.Pose(
             percentOpen = tipWrist/(1.95*knuckleWrist)
 
             mappedPercentOpen = int((50 + 80*(percentOpen-0.2)))
-            gripCommand = str(4) + str(mappedPercentOpen) + "\n"
+            filter[4][counter % numPrevious] = mappedPercentOpen
+            gripCommand = str(4) + str(int(np.mean(filter[4]))) + "\n"
 
             #These are vector calculations to get the wrist angle. It compares a vector
             #of the elbow to the wrist, and a vector of the wrist to the middle finger knuckle
@@ -120,7 +156,8 @@ with mp_pose.Pose(
             
             #Map the angle to a value that fits the servo 
             wristValue = int(50 + 120/150*angle_degrees)
-            wristCommand = str(3) + str(wristValue) + "\n"
+            filter[3][counter % numPrevious] = wristValue
+            wristCommand = str(3) + str(int(np.mean(filter[3]))) + "\n"
             
             #Draw hand locations on the image
             mp_drawing.draw_landmarks(
@@ -130,8 +167,9 @@ with mp_pose.Pose(
               mp_drawing_styles.get_default_hand_landmarks_style(),
               mp_drawing_styles.get_default_hand_connections_style())
             
-            if handResults.multi_hand_landmarks and counter & 3 == 0:
-               #pass
+            if handResults.multi_hand_landmarks:
+              
+               serialInst.write(baseCommand.encode('utf-8'))
                serialInst.write(gripCommand.encode('utf-8'))
                serialInst.write(wristCommand.encode('utf-8'))
                serialInst.write(elbowCommand.encode('utf-8'))
