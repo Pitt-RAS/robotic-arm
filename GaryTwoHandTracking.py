@@ -76,6 +76,8 @@ with mp_pose.Pose(
           a = acos((C**2 + B**2 - A**2) / (2*C*B))
           a = (180 * a) / 3.14159
           a = 180 - a
+          if a < 0:
+             a = 0
           filter[2][counter % numPrevious] = a
           
           elbowCommand = str(2) + str(int(np.mean(filter[2]))) + "\n"
@@ -88,6 +90,8 @@ with mp_pose.Pose(
           shoulderAngle = (180 * shoulderAngle) / 3.14159
           mappedShoulderAngle = 15 + ((shoulderAngle * 125) / 180)
           #mappedShoulderAngle = 180 - mappedShoulderAngle
+          if mappedShoulderAngle < 0:
+             mappedShoulderANgle = 0
           filter[1][counter % numPrevious] = mappedShoulderAngle
           shoulderCommand = str(1) + str(int(np.mean(filter[1]))) + "\n"
 
