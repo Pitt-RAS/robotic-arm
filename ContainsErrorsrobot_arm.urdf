@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<robot name="robot_arm">
+    <!-- Base Link -->
+    <link name="base_link"/>
+    
+    <!-- Shoulder Link -->
+    <link name="shoulder"/>
+    <joint name="base_to_shoulder" type="revolute">
+        <parent link="base_link"/>
+        <child link="shoulder"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="-1.5708" upper="1.5708" effort="1.0" velocity="1.0"/>
+    </joint>
+    
+    <!-- Elbow Link -->
+    <link name="elbow"/>
+    <joint name="shoulder_to_elbow" type="revolute">
+        <parent link="shoulder"/>
+        <child link="elbow"/>
+        <origin xyz="0 0 0.48" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="3.1416" effort="1.0" velocity="1.0"/>
+    </joint>
+    
+    <!-- Wrist Link -->
+    <link name="wrist"/>
+    <joint name="elbow_to_wrist" type="revolute">
+        <parent link="elbow"/>
+        <child link="wrist"/>
+        <origin xyz="0 0 0.465" rpy="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="3.1416" effort="1.0" velocity="1.0"/>
+    </joint>
+    
+    <!-- End Effector Link -->
+    <link name="end_effector"/>
+    <joint name="wrist_to_end_effector" type="fixed">
+        <parent link="wrist"/>
+        <child link="end_effector"/>
+        <origin xyz="0 0 0.8" rpy="0 0 0"/>
+    </joint>
+</robot>

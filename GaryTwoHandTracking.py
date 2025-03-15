@@ -18,7 +18,7 @@ for one in ports:
 
 serialInst.baudrate = 115200
 serialInst.port = "/dev/cu.usbserial-1120"
-serialInst.open()
+#serialInst.open()
 
 baseCommand = "090"
 shoulderCommand = "175"
@@ -181,13 +181,13 @@ with mp_pose.Pose(
               baseCommand = str(0) + str(int(np.mean(filter[0]))) + "\n"
 
             
-            if handResults.multi_hand_landmarks:
-              
-              serialInst.write(baseCommand.encode('utf-8'))
-              serialInst.write(gripCommand.encode('utf-8'))
-              serialInst.write(wristCommand.encode('utf-8'))
-              serialInst.write(elbowCommand.encode('utf-8'))
-              serialInst.write(shoulderCommand.encode('utf-8'))
+            #if handResults.multi_hand_landmarks:
+            #  
+            #  serialInst.write(baseCommand.encode('utf-8'))
+            #  serialInst.write(gripCommand.encode('utf-8'))
+            #  serialInst.write(wristCommand.encode('utf-8'))
+            #  serialInst.write(elbowCommand.encode('utf-8'))
+            #  serialInst.write(shoulderCommand.encode('utf-8'))
         
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         cv2.imshow('MediaPipe Pose and Hand Tracking', cv2.flip(image, 1))
