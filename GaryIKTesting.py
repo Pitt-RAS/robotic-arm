@@ -13,7 +13,7 @@ robot_arm = Chain(name = "Robot", links = [Base, Shoulder, Elbow, End])
 #print(robot_arm.forward_kinematics([0, 1.57, 0, 0])[:3, 3])
 
 format_float = np.vectorize(lambda x: "%.6f" % x)
-radVals = format_float(robot_arm.inverse_kinematics((0, 75, 75))) #Get rad values out of scientific notation
+radVals = format_float(robot_arm.inverse_kinematics((82, 65, 107))) #Get rad values out of scientific notation
 radVals = np.array(radVals, dtype=float) #Turn this into an np array
 degVals = 57.2957795*radVals #Turn rad to deg
 degVals = degVals+90 #Add 90 to make up for the 90 removed in the DH paramaters 
