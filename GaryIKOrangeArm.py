@@ -12,8 +12,8 @@ for one in ports:
     print(str(one))
 
 serialInst.baudrate = 115200
-serialInst.port = "/dev/cu.usbserial-1120"
-serialInst.open()
+#serialInst.port = "/dev/cu.usbserial-1120"
+#serialInst.open()
 
 
 Base = DHLink(name="Base", d=0, a=0, alpha=-1.57079633, theta=1.57079633, bounds = (-1.57079633, 1.57079633))
@@ -22,6 +22,20 @@ Elbow = DHLink(name="Elbow", d=0, a=47, alpha=0, theta=0, bounds=(-1.57079633, 1
 End = DHLink(name="End", d=0, a=80, alpha=0, theta=1.57079633, bounds=(-1.57079633, 1.57079633))
 
 robot_arm = Chain(name = "Robot", links = [Base, Shoulder, Elbow, End])
+
+for link in robot_arm.links:
+    print(link.name, link.bounds, link.theta)
+
+Base.name = "Base"
+Base.bounds = (-1.57079633, 1.57079633)
+Shoulder.name = "Shoulder"
+Shoulder.bounds = (-1.57079633, 1.57079633)
+Elbow.name = "Elbow"
+Elbow.bounds = (-1.57079633, 1.57079633)
+End.name = "End"
+End.bounds = (-1.57079633, 1.57079633)
+for link in robot_arm.links:
+    print(link.name, link.bounds, link.theta)
 
 print("x val")
 x = int(input(), base=10)

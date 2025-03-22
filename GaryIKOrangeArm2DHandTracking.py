@@ -26,8 +26,8 @@ for one in ports:
     print(str(one))
 
 serialInst.baudrate = 115200
-serialInst.port = "/dev/cu.usbserial-1120"
-serialInst.open()
+#serialInst.port = "/dev/cu.usbserial-1120"
+#serialInst.open()
 
 
 Base = DHLink(name="Base", d=0, a=0, alpha=-1.57079633, theta=1.57079633, bounds = (-1.57079633, 1.57079633))
@@ -78,10 +78,12 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
           degVals = np.round(degVals).astype(int) #Cast to int
           print(degVals)
           
-          for i in range(len(degVals)):
-           current = str(i) + str(degVals[i])
-           command = current + "\n"
-           serialInst.write(command.encode('utf-8'))
+        #Check IK orange arm for how to fix this
+
+          #for i in range(len(degVals)):
+          # current = str(i) + str(degVals[i])
+          # command = current + "\n"
+          # serialInst.write(command.encode('utf-8'))
 
           mp_drawing.draw_landmarks(
             image, 
