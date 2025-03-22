@@ -1,12 +1,6 @@
 import numpy as np
-from ikpy.utils.plot import plot_chain
-import matplotlib.pyplot as plt
-import ikpy.utils.plot as plot_utils
 from ikpy.chain import Chain
-from ikpy.link import OriginLink
-from ikpy.link import Link
 from ikpy.link import DHLink
-from ikpy.link import URDFLink
 
 
 
